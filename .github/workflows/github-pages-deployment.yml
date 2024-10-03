@@ -1,42 +1,43 @@
-name: Github Pages Deployment
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy to Github Pages
 
 on:
-  workflow_dispatch:  # This allows the workflow to be triggered manually
+  # Runs on pushes targeting the default branch
+  push:
+    branches: [$default-branch]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read  # Grants read permissions to fetch repo contents
-  pages: write    # Grants write permission to deploy to GitHub Pages
-  id-token: write # Required for authentication
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Step 4: Upload the build output as a Pages artifact
-      - name: Upload artifact for deployment
-        uses: actions/upload-pages-artifact@v4
-        with:
-          node-version: '20' # Specify your desired Node.js version
-          path: ./public # Adjust this to your build output directory
-
+  # Single deploy job since we're just deploying
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write    # Grants write permissions to deploy to GitHub Pages
-      id-token: write # Required for authentication
-
-    # Deploy to the github-pages environment
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
+    runs-on: ubuntu-latest
     steps:
-      # Step 5: Deploy to GitHub Pages using the deploy-pages action
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: './public'
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
