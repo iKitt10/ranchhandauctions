@@ -19,8 +19,9 @@ jobs:
 
       # Step 4: Upload the build output as a Pages artifact
       - name: Upload artifact for deployment
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v4
         with:
+          node-version: '20' # Specify your desired Node.js version
           path: ./public # Adjust this to your build output directory
 
   deploy:
@@ -30,7 +31,12 @@ jobs:
       pages: write    # Grants write permissions to deploy to GitHub Pages
       id-token: write # Required for authentication
 
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       # Step 5: Deploy to GitHub Pages using the deploy-pages action
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
