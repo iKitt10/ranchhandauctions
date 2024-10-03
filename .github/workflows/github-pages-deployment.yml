@@ -9,16 +9,28 @@ permissions:
   id-token: write # Required for authentication
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 4: Deploy to GitHub Pages using the deploy-pages action
+      # Step 4: Upload the build output as a Pages artifact
+      - name: Upload artifact for deployment
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./public # Adjust this to your build output directory
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write    # Grants write permissions to deploy to GitHub Pages
+      id-token: write # Required for authentication
+
+    steps:
+      # Step 5: Deploy to GitHub Pages using the deploy-pages action
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
-        with:
-          # This is the path to your static site's output (e.g., build folder)
-          folder: ./public
